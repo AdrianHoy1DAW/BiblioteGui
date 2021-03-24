@@ -47,6 +47,20 @@ public class Ejemplar implements Serializable {
 	public Socio getPoseedor() {
 		return poseedor;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof Ejemplar) {
+			Ejemplar e = (Ejemplar)o;
+			if(e.codigo == this.codigo)
+				return true;
+			else
+				return false;
+		} else {
+			return false;
+		}
+		
+	}
 
 
 	@Override

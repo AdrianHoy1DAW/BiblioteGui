@@ -12,10 +12,12 @@ import javax.swing.JTextField;
 import biblioteca.Biblioteca;
 import entrada.Entrada;
 import guardado.Guardado;
+import libro.Ejemplar;
 import libro.Libro;
 import socio.Socio;
 import vista.VistaAnyadir;
 import vista.VistaBiblioteca;
+import vista.VistaDevolver;
 import vista.VistaLibro;
 import vista.VistaPrestar;
 import vista.VistaSocio;
@@ -30,6 +32,7 @@ public class ControladorBiblioteca implements ActionListener{
 	VistaAnyadir vistaAnyadir;
 	VistaSocio vistaSocio;
 	VistaPrestar vistaPrestar;
+	VistaDevolver vistaDevolver;
 	Guardado g = new Guardado();
 	
 	public ControladorBiblioteca(VistaBiblioteca vista) {
@@ -52,6 +55,7 @@ public class ControladorBiblioteca implements ActionListener{
 		vista.getBtnRegistrarSocio().addActionListener(this);
 		vista.getBtnMostrarSocios().addActionListener(this);
 		vista.getBtnAlquilar().addActionListener(this);
+		vista.getBtnDevolver().addActionListener(this);
 		
 		// Añadir Comandos a los botones
 		vista.getBtnRegistrarLibro().setActionCommand("AbrirRegistroLibro");
@@ -60,6 +64,7 @@ public class ControladorBiblioteca implements ActionListener{
 		vista.getBtnRegistrarSocio().setActionCommand("AbrirRegistrarSocio");
 		vista.getBtnMostrarSocios().setActionCommand("MostrarSocio");
 		vista.getBtnAlquilar().setActionCommand("AbrirPrestarLibro");
+		vista.getBtnDevolver().setActionCommand("AbrirDevolucion");
 	}
 	
 	
@@ -187,6 +192,18 @@ public class ControladorBiblioteca implements ActionListener{
 			
 			Prestar();
 			
+		} else if(comando.equals("AbrirDevolucion")) {
+			
+			AbrirDevolucion();
+			
+		} else if(comando.equals("ComprobarSocios")) {
+			
+			ComprobarSocios();
+			
+		} else if(comando.equals("Devolver")) {
+			
+			Devolver();
+			
 		}
 		
 		
@@ -194,13 +211,63 @@ public class ControladorBiblioteca implements ActionListener{
 
 
 
+	private void Devolver() {
+		
+		Socio s = (Socio)vistaDevolver.getComboBoxSocios().getSelectedItem();
+		Ejemplar e = (Ejemplar)vistaDevolver.getComboBoxEjemplares().getSelectedItem();
+		
+		b.giveBackBook(s);
+		
+	}
+
+	private boolean ComprobarSocios() {
+		
+		Socio s = (Socio)vistaDevolver.getComboBoxSocios().getSelectedItem();
+		
+		if(s.getPrestados().isEmpty()) {
+			JOptionPane.showMessageDialog(vistaDevolver,"No tienes libros prestados","Informacion", JOptionPane.INFORMATION_MESSAGE);
+			return false;
+		} else {
+			vistaDevolver.getDcme().addAll();
+			vistaDevolver.getBtnDevolver().setEnabled(true);
+			return true;
+		}
+		
+	}
+
+	private void AbrirDevolucion() {
+		
+		vistaDevolver = new VistaDevolver();
+		
+		if(b.getLibros().isEmpty()) {
+			JOptionPane.showMessageDialog(vista, "No hay libros en la biblioteca", "Error", JOptionPane.ERROR_MESSAGE);
+		} else if(b.getSocios().isEmpty()) {
+			JOptionPane.showMessageDialog(vista, "No hay socios en la registrados", "Error", JOptionPane.ERROR_MESSAGE); 
+		} else {
+			
+			vistaDevolver.setVisible(true);
+			vistaDevolver.getDcms().addAll(b.getSocios());
+			vistaDevolver.getDcms().setSelectedItem(b.getSocios().get(0));
+			vistaDevolver.getBtnDevolver().setEnabled(false);
+			
+			vistaDevolver.getBtnComprobar().addActionListener(this);
+			vistaDevolver.getBtnDevolver().addActionListener(this);
+			
+			vistaDevolver.getBtnComprobar().setActionCommand("ComprobarSocios");
+			vistaDevolver.getBtnDevolver().setActionCommand("Devolver");
+		}
+		
+	}
+
 	private void Prestar() {
 		
 		Libro l = (Libro) vistaPrestar.getComboBoxLibro().getSelectedItem();
 		Socio s = (Socio) vistaPrestar.getComboBoxSocio().getSelectedItem();
 		
 		try {
-			b.lendBook(s, l);
+			if(Comprobar() == true)
+				b.lendBook(s, l);
+				
 		} catch (Exception e) {
 			
 			JOptionPane.showMessageDialog(vistaPrestar, "No puedes alquilar más de tres libros", "Informacion", JOptionPane.INFORMATION_MESSAGE);
@@ -209,14 +276,18 @@ public class ControladorBiblioteca implements ActionListener{
 		
 	}
 
-	private void Comprobar() {
+	private boolean Comprobar() {
+		
 		
 		Libro l = (Libro) vistaPrestar.getComboBoxLibro().getSelectedItem();
 		
 		if(b.comprobarEjemplares(l) == false) {
 			JOptionPane.showMessageDialog(vistaPrestar,"No hay ejemplares de ese libro disponibles","Error", JOptionPane.ERROR_MESSAGE);
+			vistaPrestar.getBtnPrestar().setEnabled(false);
+			return false;
 		} else {
 			vistaPrestar.getBtnPrestar().setEnabled(true);
+			return true;
 		}
 		
 	}

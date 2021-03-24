@@ -40,9 +40,9 @@ public class Biblioteca implements Serializable {
 				
 	}
 	
-	public void giveBackBook(Socio socio) {
+	public void giveBackBook(Socio socio, Ejemplar e) {
 		
-		socio.giveBack();
+		socio.giveBack(e);
 		
 	}
 	

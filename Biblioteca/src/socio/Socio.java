@@ -59,24 +59,10 @@ public class Socio implements Comparable<Socio>, Serializable{
 		
 	}
 	
-	public void giveBack() {
-		if(prestados.isEmpty()) {
-			Entrada.Mensaje("No tienes libros prestados");	
-		} else {
-			Entrada.Mensaje("Que libro quieres devolver: " + prestados);
-			int numero = Entrada.pedirInt();
-			if(numero > prestados.size()) {
-				Entrada.Mensaje("No tienes tantos libros");
-				
-			} else {
-				prestados.get(numero -1).giveBack();
-				prestados.remove(numero -1);
-				
-			}
-
-			
-		}
-
+	public void giveBack(Ejemplar e) {
+		
+		e.giveBack();
+		prestados.remove(e);
 		
 	}
 	

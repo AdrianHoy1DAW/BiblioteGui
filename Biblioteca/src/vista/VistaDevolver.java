@@ -6,9 +6,15 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import libro.Ejemplar;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import net.miginfocom.swing.MigLayout;
+import socio.Socio;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -18,9 +24,12 @@ import java.awt.Font;
 public class VistaDevolver extends JFrame {
 
 	private JPanel contentPane;
-	private JComboBox comboBox;
+	private JComboBox<Socio> comboBoxSocios;
 	private JButton btnComprobar;
-
+	private JComboBox<Ejemplar> comboBoxEjemplares;
+	private JButton btnDevolver;
+	private DefaultComboBoxModel<Socio> dcms = new DefaultComboBoxModel<>();
+	private DefaultComboBoxModel<Ejemplar> dcme = new DefaultComboBoxModel<>();
 
 
 	/**
@@ -61,7 +70,7 @@ public class VistaDevolver extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		
-		JButton btnDevolver = new JButton("Devolver");
+		btnDevolver = new JButton("Devolver");
 		panel_2.add(btnDevolver);
 		panel_1.setLayout(new MigLayout("", "[grow]", "[][]"));
 		
@@ -69,20 +78,61 @@ public class VistaDevolver extends JFrame {
 		lblEstosSonLos.setFont(new Font("Dialog", Font.BOLD, 15));
 		panel_1.add(lblEstosSonLos, "cell 0 0");
 		
-		JComboBox comboBox_1 = new JComboBox();
-		panel_1.add(comboBox_1, "cell 0 1,growx");
+		comboBoxEjemplares = new JComboBox<>();
+		comboBoxEjemplares.setModel(dcme);
+		panel_1.add(comboBoxEjemplares, "cell 0 1,growx");
 		panel.setLayout(new MigLayout("", "[grow][]", "[][]"));
 		
 		JLabel lblPorFavorSelecciona = new JLabel("Por favor selecciona tu usuario");
 		lblPorFavorSelecciona.setFont(new Font("Dialog", Font.BOLD, 15));
 		panel.add(lblPorFavorSelecciona, "cell 0 0");
 		
-		comboBox = new JComboBox();
-		panel.add(comboBox, "cell 0 1,growx");
+		comboBoxSocios = new JComboBox<>();
+		comboBoxSocios.setModel(dcms);
+		panel.add(comboBoxSocios, "cell 0 1,growx");
 		
 		btnComprobar = new JButton("Comprobar");
 		panel.add(btnComprobar, "cell 1 1");
 		contentPane.setLayout(gl_contentPane);
 	}
+
+
+	public JPanel getContentPane() {
+		return contentPane;
+	}
+
+
+	public JComboBox<Socio> getComboBoxSocios() {
+		return comboBoxSocios;
+	}
+
+
+	public JButton getBtnComprobar() {
+		return btnComprobar;
+	}
+
+
+	public JComboBox<Ejemplar> getComboBoxEjemplares() {
+		return comboBoxEjemplares;
+	}
+
+
+	public JButton getBtnDevolver() {
+		return btnDevolver;
+	}
+
+
+	public DefaultComboBoxModel<Socio> getDcms() {
+		return dcms;
+	}
+
+
+	public DefaultComboBoxModel<Ejemplar> getDcme() {
+		return dcme;
+	}
+	
+	
+	
+	
 
 }
