@@ -49,10 +49,10 @@ public class Socio implements Comparable<Socio>, Serializable{
 		
 	}
 	
-	public void lend(Ejemplar libro) {
+	public void lend(Ejemplar libro) throws Exception {
 		
 		if(prestados.size() >= cantidadMaxima) {
-			Entrada.Mensaje("No puedes solicitar más de tres libros");
+			throw new Exception("No puedes alquilar mas de tres libros");
 		} else {
 			prestados.add(libro);
 		}
@@ -106,8 +106,7 @@ public class Socio implements Comparable<Socio>, Serializable{
 
 	@Override
 	public String toString() {
-		return "Socio [nombre=" + nombre + ", apellidos=" + apellidos + ", DNI=" + DNI  + 
-				"] \n";
+		return nombre;
 	}
 	
 	

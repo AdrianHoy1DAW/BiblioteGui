@@ -36,12 +36,10 @@ public class VistaTabla extends JFrame {
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
-		dtm.addColumn("Titulo");
-		dtm.addColumn("Autor");
-		dtm.addColumn("ISBN");
-		dtm.addColumn("Número de Ejemplares");
+
 		table.setModel(dtm);
 		scrollPane.setViewportView(table);
+		setTitle("Biblioteca Adrihosan - Mostrar");
 	}
 
 

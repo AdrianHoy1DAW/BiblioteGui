@@ -32,26 +32,12 @@ public class Biblioteca implements Serializable {
 		return socios;
 	}
 	
-	public void lendBook(Socio socio, Libro libro) {
+	public void lendBook(Socio socio, Libro libro) throws Exception {
 		
-		if(socios.contains(socio) && libros.contains(libro)) {
-			if(libro.hayEjemplares() == true) {
-				if(libro.prestarEjemplar() != null) {
 					Ejemplar e = libro.prestarEjemplar();
 					socio.lend(e);
 					e.lend(socio);
-				} else {
-					Entrada.Mensaje("No hay ejemplares disponibles en este momento");
-				}
-			} else {
-				Entrada.Mensaje("No disponemos de ejemplares de ese libro en ese momento");
-			}
-		} else if(!socios.contains(socio)) {
-			Entrada.Mensaje("Para pedir prestado un libro necesitas estar registrado");
-		} else {
-			Entrada.Mensaje("No disponimos de ese libro");
-		}
-		
+				
 	}
 	
 	public void giveBackBook(Socio socio) {
@@ -59,23 +45,27 @@ public class Biblioteca implements Serializable {
 		socio.giveBack();
 		
 	}
-
-	public void createAccount() {
-		String nombre ;
-		String apellidos;
-		String DNI;
+	
+	public boolean comprobarEjemplares(Libro l) {
 		
-		Entrada.Mensaje("Introduce tu nombre de usuario");
-		nombre = Entrada.pedirString();
-		Entrada.Mensaje("Introduce tus apellidos");
-		apellidos = Entrada.pedirString();
-		Entrada.Mensaje("Introduce tu DNI");
-		DNI = Entrada.pedirString();
-		while(comprobarDNI(DNI) == false) {
-			Entrada.Mensaje("Ese DNI ya esta en la base de datos");
-			DNI = Entrada.pedirString();
+		if(l.prestarEjemplar() != null) {
+			return true;
+		} else {
+			return false;
 		}
-		socios.add(new Socio(nombre , apellidos, DNI));
+		
+		
+	}
+
+	public void createAccount(String nombre, String apellidos, String DNI) throws Exception {
+	
+		
+		if(buscarSocio(DNI) != null) {
+			throw new Exception("Ese Socio ya esta");
+		} else {
+			socios.add(new Socio(nombre , apellidos, DNI));
+		}
+		
 		
 	}
 	
@@ -171,7 +161,7 @@ public class Biblioteca implements Serializable {
 		
 		Socio s = null;
 		if(socios.isEmpty()) {
-			Entrada.Mensaje("Esa cuenta no esta creada");
+			
 			return null;
 		} else {
 			for(int i = 0; i < socios.size() ; i++) {
@@ -181,9 +171,7 @@ public class Biblioteca implements Serializable {
 				}
 			}
 		}
-		if(s == null ) {
-			Entrada.Mensaje("Ese usuario no existe");
-		}
+
 		return s;
 		
 	}
