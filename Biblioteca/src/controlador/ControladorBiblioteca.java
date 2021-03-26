@@ -3,14 +3,23 @@ package controlador;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import biblioteca.Biblioteca;
 import entrada.Entrada;
+
 import guardado.Guardado;
 import libro.Ejemplar;
 import libro.Libro;
@@ -56,6 +65,8 @@ public class ControladorBiblioteca implements ActionListener{
 		vista.getBtnMostrarSocios().addActionListener(this);
 		vista.getBtnAlquilar().addActionListener(this);
 		vista.getBtnDevolver().addActionListener(this);
+		vista.getMntmOpen().addActionListener(this);
+		vista.getMntmSave().addActionListener(this);
 		
 		// Añadir Comandos a los botones
 		vista.getBtnRegistrarLibro().setActionCommand("AbrirRegistroLibro");
@@ -65,82 +76,13 @@ public class ControladorBiblioteca implements ActionListener{
 		vista.getBtnMostrarSocios().setActionCommand("MostrarSocio");
 		vista.getBtnAlquilar().setActionCommand("AbrirPrestarLibro");
 		vista.getBtnDevolver().setActionCommand("AbrirDevolucion");
+		vista.getMntmOpen().setActionCommand("Open");
+		vista.getMntmSave().setActionCommand("Save");
 	}
 	
 	
 	public  void go() {
 		vista.setVisible(true);
-//		vista.setVisible(true);
-//		int eleccion = 0;
-//		int eleccionOrdenacion = 0;
-//		while(eleccion != 8) {
-//			 eleccion = Entrada.Menu();
-//			 switch(eleccion) {
-//			 case 1:
-//				 b.registerBook();
-//				break;
-//			 case 2:
-//				 b.createAccount();
-//				 break;
-//			 case 3:
-//				 Entrada.Mensaje(b.getLibros() + "Introduce el ISBN del libro que quieras alquilar");
-//				 String ISBN = Entrada.pedirString();
-//				 Entrada.Mensaje("Introduce tu DNI");
-//				 String DNI = Entrada.pedirString();
-//				 b.lendBook(b.buscarSocio(DNI), b.buscarLibro(ISBN));
-//				 break;
-//			 case 4:
-//				 Entrada.Mensaje("Introduce tu DNI");
-//				 DNI = Entrada.pedirString();
-//				 b.giveBackBook(b.buscarSocio(DNI));
-//				 break;
-//			 case 5:
-//				 if(b.getLibros().isEmpty()) {
-//					 Entrada.Mensaje("No hay libros en esta biblioteca");
-//				 } else {
-//					 eleccionOrdenacion = Entrada.MenuLibro();
-//					 if(eleccionOrdenacion == 1) {
-//						b.getLibros().sort(b.getLibros().get(0).COMPARE_BY_EJEMPLARES);
-//						Entrada.Mensaje("Estos son los libros que tenemos ordenados por número de ejemplares: " + b.getLibros());
-//					 } else if(eleccionOrdenacion == 2) {
-//						 b.getLibros().sort(b.getLibros().get(0).COMPARE_BY_TITULO);
-//						 Entrada.Mensaje("Estos son los libros que tenemos ordenados por título: " + b.getLibros());
-//					 } else if(eleccionOrdenacion == 3) {
-//						 b.getLibros().sort(b.getLibros().get(0).COMPARE_BY_AUTOR);
-//						 Entrada.Mensaje("Estos son los libros que tenemos ordenados por autor: " + b.getLibros());
-//					 } else {
-//						 Entrada.Mensaje("Estos son los libros que tenemos ordenados por defecto: " + b.getLibros());
-//					 }
-//				 }
-//				 break;
-//			 case 6:
-//				 if(b.getSocios().isEmpty()) {
-//					 Entrada.Mensaje("No hay socios registrados");
-//				 } else {
-//					 
-//					 eleccionOrdenacion = Entrada.MenuSocio();
-//					 if(eleccionOrdenacion == 1) {
-//						 b.getSocios().sort(b.getSocios().get(0).COMPARE_BY_PRESTADOS);
-//						 Entrada.Mensaje("Estos son los socios que tenemos ordenados por número de libros prestados: " + b.getSocios());
-//					 } else if(eleccionOrdenacion == 2) {
-//						 b.getSocios().sort(b.getSocios().get(0).COMPARE_BY_NOMBRE);
-//						 Entrada.Mensaje("Estos son los socios ordenados por nombre: " + b.getSocios());
-//					 } else {
-//						 Entrada.Mensaje("Estos son los socios registrados ordenados por defecto: " + b.getSocios());
-//					 }
-//			 	}
-//				 break;
-//			 case 7:
-//				 Entrada.Mensaje(b.getLibros() + "De que libro quieres añadir ejemplares?");
-//				 ISBN = Entrada.pedirString();
-//				 Entrada.Mensaje("Cuantos ejemplares recibimos");
-//				 b.reciveEjemplares(Entrada.pedirInt(), b.buscarLibro(ISBN));
-//				 break;
-//		
-//			 }
-//			 
-//		}
-//		g.store(b);
 	}
 
 	@Override
@@ -204,6 +146,14 @@ public class ControladorBiblioteca implements ActionListener{
 			
 			Devolver();
 			
+		} else if(comando.equals("Open")) {
+			
+			open();
+			
+		} else if(comando.equals("Save")) {
+			
+			save();
+			
 		}
 		
 		
@@ -216,7 +166,11 @@ public class ControladorBiblioteca implements ActionListener{
 		Socio s = (Socio)vistaDevolver.getComboBoxSocios().getSelectedItem();
 		Ejemplar e = (Ejemplar)vistaDevolver.getComboBoxEjemplares().getSelectedItem();
 		
-		b.giveBackBook(s);
+		if(ComprobarSocios() == true) {
+			b.giveBackBook(s,e);
+		}
+		
+		vistaDevolver.getBtnDevolver().setEnabled(false);
 		
 	}
 
@@ -228,7 +182,9 @@ public class ControladorBiblioteca implements ActionListener{
 			JOptionPane.showMessageDialog(vistaDevolver,"No tienes libros prestados","Informacion", JOptionPane.INFORMATION_MESSAGE);
 			return false;
 		} else {
-			vistaDevolver.getDcme().addAll();
+			vistaDevolver.getDcme().removeAllElements();
+			vistaDevolver.getDcme().addAll(((Socio)vistaDevolver.getComboBoxSocios().getSelectedItem()).getPrestados());
+			vistaDevolver.getDcme().setSelectedItem(((Socio)vistaDevolver.getComboBoxSocios().getSelectedItem()).getPrestados().get(0));
 			vistaDevolver.getBtnDevolver().setEnabled(true);
 			return true;
 		}
@@ -476,6 +432,59 @@ public class ControladorBiblioteca implements ActionListener{
 		vistaLibro.getBtnAnyadirLibro().setActionCommand("RegistrarLibro");
 		
 		
+	}
+	
+	private void open() {
+		
+		JFileChooser jfc = new JFileChooser();
+		int opcion = jfc.showOpenDialog(vista);
+		
+		if(opcion == JFileChooser.APPROVE_OPTION) {
+			
+			try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(jfc.getSelectedFile()))) {
+				
+					
+					b = (Biblioteca)ois.readObject();
+			
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+
+		
+	}
+
+
+
+	private void save() {
+		
+		JFileChooser jfc = new JFileChooser();
+		int opcion = jfc.showSaveDialog(vista);
+		
+		if(opcion == JFileChooser.APPROVE_OPTION) {
+			
+			try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(jfc.getSelectedFile()))) {
+				
+				oos.writeObject(b);
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}	
 	}
 	
 
